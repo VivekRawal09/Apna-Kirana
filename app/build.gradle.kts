@@ -84,4 +84,5 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended")
 
+    implementation("org.jetbrains.kotlin:kotlin-metadata-jvm:1.9.0")
 }
