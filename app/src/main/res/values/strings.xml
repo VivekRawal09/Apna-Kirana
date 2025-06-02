@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">Apna Kirana</string>
+    <string name="app_name">ApnaKirana</string>
+    <string name="fresh_groceries_delivered">Fresh groceries delivered to your doorstep</string>
+    <string name="get_started">Get Started</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="cart">Cart</string>
+    <string name="profile">Profile</string>
+    <string name="made_with_love_in_india">Made with ❤️ in India</string>
 </resources>
