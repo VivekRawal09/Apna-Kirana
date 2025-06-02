@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
+    id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
 }
 
@@ -69,7 +69,7 @@ dependencies {
     // Hilt for Dependency Injection
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-compiler:2.48")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // Room Database
     implementation("androidx.room:room-runtime:2.7.1")
