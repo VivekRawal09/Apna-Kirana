@@ -30,8 +30,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// secod chaange
-
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
