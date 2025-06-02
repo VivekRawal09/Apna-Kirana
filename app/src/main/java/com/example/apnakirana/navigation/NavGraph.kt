@@ -1,0 +1,80 @@
+package com.example.apnakirana.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.example.apnakirana.presentation.onboarding.OnboardingScreen
+import com.example.apnakirana.presentation.splash.SplashScreen
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+
+
+@Composable
+fun NavGraph(
+    navController: NavHostController,
+    startDestination: String = Screen.Splash.route
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable(Screen.Splash.route) {
+            SplashScreen(
+                onSplashFinished = {
+                    navController.navigate(Screen.Onboarding.route) {
+                        popUpTo(Screen.Splash.route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.Onboarding.route) {
+            OnboardingScreen(
+                onFinished = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Onboarding.route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.Home.route) {
+            // Placeholder for Home Screen - we'll implement this in Phase 2
+            PlaceholderScreen(title = "Home Screen")
+        }
+
+        composable(Screen.Search.route) {
+            // Placeholder for Search Screen - we'll implement this in Phase 2
+            PlaceholderScreen(title = "Search Screen")
+        }
+
+        composable(Screen.Cart.route) {
+            // Placeholder for Cart Screen - we'll implement this in Phase 2
+            PlaceholderScreen(title = "Cart Screen")
+        }
+
+        composable(Screen.Profile.route) {
+            // Placeholder for Profile Screen - we'll implement this in Phase 4
+            PlaceholderScreen(title = "Profile Screen")
+        }
+    }
+}
+
+// Temporary placeholder for screens we haven't built yet
+@Composable
+fun PlaceholderScreen(title: String) {
+    androidx.compose.foundation.layout.Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = androidx.compose.ui.Alignment.Center
+    ) {
+        androidx.compose.material3.Text(
+            text = title,
+            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
+        )
+    }
+}
