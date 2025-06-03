@@ -1,34 +1,26 @@
 package com.example.apnakirana.presentation.home
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,30 +30,29 @@ import coil.compose.AsyncImage
 import com.example.apnakirana.data.local.entity.Category
 import com.example.apnakirana.data.local.entity.Product
 import com.example.apnakirana.ui.theme.ApnaKiranaTheme
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    onCategoryClick: (Category) -> Unit = {},
+    onProductClick: (Product) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     if (uiState.isLoading) {
-        LoadingScreen()
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
     } else {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFF8FAFB),
-                            Color(0xFFF0F4F7)
-                        )
-                    )
-                ),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .background(Color(0xFFF5F5F5)),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Top Bar with Search
             item {
@@ -79,7 +70,7 @@ fun HomeScreen(
             item {
                 CategoriesSection(
                     categories = uiState.categories,
-                    onCategoryClick = viewModel::onCategoryClick
+                    onCategoryClick = onCategoryClick
                 )
             }
 
@@ -87,7 +78,7 @@ fun HomeScreen(
             item {
                 FeaturedProductsSection(
                     products = uiState.featuredProducts,
-                    onProductClick = viewModel::onProductClick
+                    onProductClick = onProductClick
                 )
             }
 
@@ -106,112 +97,37 @@ fun HomeScreen(
     }
 }
 
-@Composable
-fun LoadingScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Animated loading indicator
-            val infiniteTransition = rememberInfiniteTransition()
-            val angle by infiniteTransition.animateFloat(
-                initialValue = 0f,
-                targetValue = 360f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(1000, easing = LinearEasing)
-                )
-            )
-
-            Box(
-                modifier = Modifier.size(60.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .graphicsLayer { rotationZ = angle },
-                    color = Color(0xFF4CAF50),
-                    strokeWidth = 4.dp
-                )
-                Text(
-                    text = "🛒",
-                    fontSize = 24.sp,
-                    modifier = Modifier.graphicsLayer {
-                        scaleX = 1f + (kotlin.math.sin(angle * Math.PI / 180) * 0.1).toFloat()
-                        scaleY = 1f + (kotlin.math.sin(angle * Math.PI / 180) * 0.1).toFloat()
-                    }
-                )
-            }
-
-            Text(
-                text = "Loading fresh groceries...",
-                fontSize = 16.sp,
-                color = Color(0xFF666666),
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
     onSearchClick: () -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.98f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-
-    Surface(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .scale(scale)
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(28.dp),
-                clip = false
-            ),
-        shape = RoundedCornerShape(28.dp),
-        color = Color.White.copy(alpha = 0.95f),
-        onClick = onSearchClick,
-        interactionSource = interactionSource
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(25.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .clickable { onSearchClick() }
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = Color(0xFF4CAF50),
-                modifier = Modifier.size(24.dp)
+                tint = Color.Gray,
+                modifier = Modifier.size(20.dp)
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = "Search for groceries...",
-                color = Color(0xFF999999),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Icon(
-                imageVector = Icons.Outlined.ThumbUp,
-                contentDescription = "Filter",
-                tint = Color(0xFF999999),
-                modifier = Modifier.size(20.dp)
+                color = Color.Gray,
+                fontSize = 16.sp
             )
         }
     }
@@ -219,100 +135,35 @@ fun HomeTopBar(
 
 @Composable
 fun WelcomeSection() {
-    val shimmerColors = listOf(
-        Color(0xFF4CAF50).copy(alpha = 0.9f),
-        Color(0xFF66BB6A).copy(alpha = 0.9f),
-        Color(0xFF4CAF50).copy(alpha = 0.9f)
-    )
-
-    val transition = rememberInfiniteTransition()
-    val translateAnim by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(4000, easing = LinearEasing)
-        )
-    )
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .shadow(
-                elevation = 12.dp,
-                shape = RoundedCornerShape(20.dp),
-                clip = false
-            ),
-        shape = RoundedCornerShape(20.dp),
+            .padding(horizontal = 16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
-        )
+            containerColor = Color(0xFF4CAF50)
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        colors = shimmerColors,
-                        start = androidx.compose.ui.geometry.Offset(translateAnim, 0f),
-                        end = androidx.compose.ui.geometry.Offset(translateAnim + 200f, 0f)
-                    )
-                )
+        Column(
+            modifier = Modifier.padding(20.dp)
         ) {
-            // Background pattern
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.1f),
-                                Color.Transparent
-                            ),
-                            radius = 600f,
-                            center = androidx.compose.ui.geometry.Offset(0f, 0f)
-                        )
-                    )
+            Text(
+                text = "Welcome to",
+                fontSize = 16.sp,
+                color = Color.White.copy(alpha = 0.9f)
             )
-
-            Row(
-                modifier = Modifier.padding(24.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "Welcome to",
-                        fontSize = 16.sp,
-                        color = Color.White.copy(alpha = 0.95f),
-                        fontWeight = FontWeight.Normal
-                    )
-                    Text(
-                        text = "ApnaKirana",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Fresh groceries delivered\nto your doorstep",
-                        fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.9f),
-                        lineHeight = 20.sp
-                    )
-                }
-
-                Text(
-                    text = "🛒",
-                    fontSize = 64.sp,
-                    modifier = Modifier
-                        .graphicsLayer {
-                            rotationZ = -15f
-                        }
-                )
-            }
+            Text(
+                text = "ApnaKirana 🛒",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Fresh groceries delivered to your doorstep",
+                fontSize = 14.sp,
+                color = Color.White.copy(alpha = 0.9f)
+            )
         }
     }
 }
@@ -322,24 +173,52 @@ fun CategoriesSection(
     categories: List<Category>,
     onCategoryClick: (Category) -> Unit
 ) {
-    Column {
-        SectionHeader(
-            title = "Shop by Category",
-            actionText = "See All",
-            onActionClick = { /* TODO: Show all categories */ }
-        )
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Shop by Category",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            TextButton(onClick = { /* TODO: Show all categories */ }) {
+                Text(
+                    "See All",
+                    fontSize = 14.sp,
+                    color = Color(0xFF4CAF50)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp)
-        ) {
-            items(categories) { category ->
-                CategoryItem(
-                    category = category,
-                    onClick = { onCategoryClick(category) }
-                )
+        // Display categories in rows of 4
+        val chunkedCategories = categories.chunked(4)
+
+        chunkedCategories.forEach { rowCategories ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                rowCategories.forEach { category ->
+                    CategoryItem(
+                        category = category,
+                        onClick = { onCategoryClick(category) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                // Fill remaining space if less than 4 items
+                repeat(4 - rowCategories.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
@@ -348,55 +227,30 @@ fun CategoriesSection(
 @Composable
 fun CategoryItem(
     category: Category,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-
     Column(
-        modifier = Modifier
-            .scale(scale)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) { onClick() }
-            .width(80.dp),
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Surface(
-            modifier = Modifier
-                .size(72.dp)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(20.dp),
-                    clip = false
-                ),
-            shape = RoundedCornerShape(20.dp),
-            color = Color.White
+        Card(
+            modifier = Modifier.size(60.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFF0F8FF)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFFF0F8FF),
-                                Color(0xFFE8F5E9)
-                            )
-                        )
-                    ),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = category.icon,
-                    fontSize = 32.sp
+                    fontSize = 24.sp
                 )
             }
         }
@@ -405,13 +259,13 @@ fun CategoryItem(
 
         Text(
             text = category.name,
-            fontSize = 13.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF2C3E50),
-            textAlign = TextAlign.Center,
+            color = Color.Black,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            lineHeight = 16.sp
+            lineHeight = 14.sp
         )
     }
 }
@@ -422,12 +276,27 @@ fun FeaturedProductsSection(
     onProductClick: (Product) -> Unit
 ) {
     Column {
-        SectionHeader(
-            title = "Featured Products",
-            emoji = "🔥",
-            actionText = "See All",
-            onActionClick = { /* TODO: Show all featured */ }
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Featured Products 🔥",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            TextButton(onClick = { /* TODO: Show all featured */ }) {
+                Text(
+                    "See All",
+                    fontSize = 14.sp,
+                    color = Color(0xFF4CAF50)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -450,278 +319,117 @@ fun ProductCard(
     product: Product,
     onClick: () -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.97f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-
     Card(
         modifier = Modifier
-            .width(170.dp)
-            .scale(scale)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) { onClick() },
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp,
-            pressedElevation = 4.dp
-        ),
-        shape = RoundedCornerShape(16.dp),
+            .width(160.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column {
-            // Product Image with Gradient Overlay
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-            ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            // Discount Badge
+            Box {
                 AsyncImage(
                     model = product.imageUrl,
                     contentDescription = product.name,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(android.R.drawable.ic_menu_gallery),
                     error = painterResource(android.R.drawable.ic_menu_gallery)
                 )
 
-                // Gradient overlay for better text visibility
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp)
-                        .align(Alignment.BottomCenter)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color.Black.copy(alpha = 0.3f)
-                                )
-                            )
-                        )
-                )
-
-                // Discount Badge
                 if (product.discount > 0) {
-                    DiscountBadge(
-                        discount = product.discount,
+                    Surface(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                    )
-                }
-
-                // Favorite Button
-                IconButton(
-                    onClick = { /* TODO: Add to favorites */ },
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(4.dp)
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.9f))
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        tint = Color(0xFF4CAF50),
-                        modifier = Modifier.size(20.dp)
-                    )
+                            .padding(4.dp),
+                        color = Color.Red,
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = "${product.discount}% OFF",
+                            fontSize = 10.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
 
-            Column(
-                modifier = Modifier.padding(12.dp)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Product Name
+            Text(
+                text = product.name,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Unit
+            Text(
+                text = product.unit,
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Price
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Product Name
-                Text(
-                    text = product.name,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color(0xFF2C3E50),
-                    lineHeight = 20.sp
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Unit
-                Text(
-                    text = product.unit,
-                    fontSize = 13.sp,
-                    color = Color(0xFF7F8C8D)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Price and Add Button
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    PriceDisplay(
-                        currentPrice = product.price,
-                        originalPrice = product.originalPrice
+                Column {
+                    Text(
+                        text = "₹${product.price.toInt()}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF4CAF50)
                     )
 
-                    AddToCartButton(
-                        onClick = { /* TODO: Add to cart */ }
+                    product.originalPrice?.let { originalPrice ->
+                        Text(
+                            text = "₹${originalPrice.toInt()}",
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            style = androidx.compose.ui.text.TextStyle(
+                                textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
+                            )
+                        )
+                    }
+                }
+
+                // Add to Cart Button
+                Button(
+                    onClick = { /* TODO: Add to cart */ },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50)
+                    ),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Text(
+                        text = "ADD",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun SectionHeader(
-    title: String,
-    emoji: String? = null,
-    actionText: String,
-    onActionClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = title,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF2C3E50)
-            )
-            emoji?.let {
-                Text(
-                    text = it,
-                    fontSize = 20.sp
-                )
-            }
-        }
-
-        TextButton(
-            onClick = onActionClick,
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = Color(0xFF4CAF50)
-            )
-        ) {
-            Text(
-                text = actionText,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun DiscountBadge(
-    discount: Int,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        color = Color(0xFFFF5252),
-        shadowElevation = 4.dp
-    ) {
-        Text(
-            text = "$discount% OFF",
-            fontSize = 11.sp,
-            color = Color.White,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun PriceDisplay(
-    currentPrice: Double,
-    originalPrice: Double?
-) {
-    Column {
-        Text(
-            text = "₹${currentPrice.toInt()}",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF4CAF50)
-        )
-
-        originalPrice?.let { price ->
-            Text(
-                text = "₹${price.toInt()}",
-                fontSize = 13.sp,
-                color = Color(0xFF999999),
-                textDecoration = TextDecoration.LineThrough
-            )
-        }
-    }
-}
-
-@Composable
-fun AddToCartButton(
-    onClick: () -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.9f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF4CAF50)
-        ),
-        modifier = Modifier
-            .height(36.dp)
-            .scale(scale),
-        interactionSource = interactionSource,
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 2.dp
-        )
-    ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Color.White
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = "ADD",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
     }
 }
 

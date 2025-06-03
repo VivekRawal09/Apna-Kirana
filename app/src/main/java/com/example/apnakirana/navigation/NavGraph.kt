@@ -6,9 +6,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.example.apnakirana.presentation.onboarding.OnboardingScreen
 import com.example.apnakirana.presentation.splash.SplashScreen
 import com.example.apnakirana.presentation.home.HomeScreen
+import com.example.apnakirana.presentation.catalog.ProductCatalogScreen
 
 @Composable
 fun NavGraph(
@@ -44,7 +47,37 @@ fun NavGraph(
         }
 
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(
+                onCategoryClick = { category ->
+                    navController.navigate(
+                        Screen.ProductCatalog.createRoute(category.id, category.name)
+                    )
+                },
+                onProductClick = { product ->
+                    navController.navigate(
+                        Screen.ProductDetail.createRoute(product.id)
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ProductCatalog.route,
+            arguments = listOf(
+                navArgument("categoryId") { type = NavType.StringType },
+                navArgument("categoryName") { type = NavType.StringType }
+            )
+        ) {
+            ProductCatalogScreen(
+                onBackPress = {
+                    navController.popBackStack()
+                },
+                onProductClick = { product ->
+                    navController.navigate(
+                        Screen.ProductDetail.createRoute(product.id)
+                    )
+                }
+            )
         }
 
         composable(Screen.Search.route) {
