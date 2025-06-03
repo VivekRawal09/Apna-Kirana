@@ -29,9 +29,10 @@ abstract class RepositoryModule {
 
     // For now, we'll use sample data repository
     // Later we can switch to real database repository
-    @Binds
-    @Singleton
-    abstract fun bindSampleDataRepository(
-        sampleDataRepository: SampleDataRepository
-    ): SampleDataRepository
+//    @Binds
+//    @Singleton
+//    abstract fun bindSampleDataRepository(
+//        sampleDataRepository: SampleDataRepository
+//    ): SampleDataRepository
+
 }

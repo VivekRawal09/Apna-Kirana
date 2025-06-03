@@ -1,14 +1,14 @@
 package com.example.apnakirana.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.apnakirana.presentation.onboarding.OnboardingScreen
 import com.example.apnakirana.presentation.splash.SplashScreen
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-
+import com.example.apnakirana.presentation.home.HomeScreen
 
 @Composable
 fun NavGraph(
@@ -44,8 +44,7 @@ fun NavGraph(
         }
 
         composable(Screen.Home.route) {
-            // Placeholder for Home Screen - we'll implement this in Phase 2
-            PlaceholderScreen(title = "Home Screen")
+            HomeScreen()
         }
 
         composable(Screen.Search.route) {
