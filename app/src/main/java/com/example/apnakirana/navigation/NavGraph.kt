@@ -12,6 +12,8 @@ import com.example.apnakirana.presentation.onboarding.OnboardingScreen
 import com.example.apnakirana.presentation.splash.SplashScreen
 import com.example.apnakirana.presentation.home.HomeScreen
 import com.example.apnakirana.presentation.catalog.ProductCatalogScreen
+import com.example.apnakirana.presentation.detail.ProductDetailScreen
+import com.example.apnakirana.presentation.cart.CartScreen
 
 @Composable
 fun NavGraph(
@@ -57,6 +59,9 @@ fun NavGraph(
                     navController.navigate(
                         Screen.ProductDetail.createRoute(product.id)
                     )
+                },
+                onAddToCartClick = { product ->
+                    // Cart functionality handled by HomeViewModel
                 }
             )
         }
@@ -79,6 +84,24 @@ fun NavGraph(
                 }
             )
         }
+        composable(
+            route = Screen.ProductDetail.route,
+            arguments = listOf(
+                navArgument("productId") { type = NavType.StringType }
+            )
+        ) {
+            ProductDetailScreen(
+                onBackPress = {
+                    navController.popBackStack()
+                },
+                onRelatedProductClick = { product ->
+                    navController.navigate(
+                        Screen.ProductDetail.createRoute(product.id)
+                    )
+                }
+            )
+        }
+
 
         composable(Screen.Search.route) {
             // Placeholder for Search Screen - we'll implement this in Phase 2
@@ -86,8 +109,13 @@ fun NavGraph(
         }
 
         composable(Screen.Cart.route) {
-            // Placeholder for Cart Screen - we'll implement this in Phase 2
-            PlaceholderScreen(title = "Cart Screen")
+            CartScreen(
+                onProductClick = { productId ->
+                    navController.navigate(
+                        Screen.ProductDetail.createRoute(productId)
+                    )
+                }
+            )
         }
 
         composable(Screen.Profile.route) {

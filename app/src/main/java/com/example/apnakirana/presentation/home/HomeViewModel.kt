@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.apnakirana.data.local.entity.Category
 import com.example.apnakirana.data.local.entity.Product
 import com.example.apnakirana.data.repository.SampleDataRepository
+import com.example.apnakirana.domain.repository.CartRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val sampleDataRepository: SampleDataRepository
+    private val sampleDataRepository: SampleDataRepository,
+    private val cartRepository: CartRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -56,6 +58,12 @@ class HomeViewModel @Inject constructor(
 
     fun onProductClick(product: Product) {
         // TODO: Navigate to product detail screen
+    }
+
+    fun onAddToCartClick(product: Product) {
+        viewModelScope.launch {
+            cartRepository.addToCart(product.id, 1)
+        }
     }
 
     fun onSearchClick() {

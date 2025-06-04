@@ -36,8 +36,9 @@ import com.example.apnakirana.ui.theme.ApnaKiranaTheme
 fun HomeScreen(
     onCategoryClick: (Category) -> Unit = {},
     onProductClick: (Product) -> Unit = {},
+    onAddToCartClick: (Product) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
-) {
+){
     val uiState by viewModel.uiState.collectAsState()
 
     if (uiState.isLoading) {
@@ -78,7 +79,8 @@ fun HomeScreen(
             item {
                 FeaturedProductsSection(
                     products = uiState.featuredProducts,
-                    onProductClick = onProductClick
+                    onProductClick = onProductClick,
+                    onAddToCartClick = onAddToCartClick
                 )
             }
 
@@ -273,7 +275,8 @@ fun CategoryItem(
 @Composable
 fun FeaturedProductsSection(
     products: List<Product>,
-    onProductClick: (Product) -> Unit
+    onProductClick: (Product) -> Unit,
+    onAddToCartClick: (Product) -> Unit
 ) {
     Column {
         Row(
@@ -307,7 +310,8 @@ fun FeaturedProductsSection(
             items(products) { product ->
                 ProductCard(
                     product = product,
-                    onClick = { onProductClick(product) }
+                    onClick = { onProductClick(product) },
+                    onAddToCartClick = { onAddToCartClick(product) }
                 )
             }
         }
@@ -317,7 +321,8 @@ fun FeaturedProductsSection(
 @Composable
 fun ProductCard(
     product: Product,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onAddToCartClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -414,7 +419,7 @@ fun ProductCard(
 
                 // Add to Cart Button
                 Button(
-                    onClick = { /* TODO: Add to cart */ },
+                    onClick = onAddToCartClick,
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF4CAF50)

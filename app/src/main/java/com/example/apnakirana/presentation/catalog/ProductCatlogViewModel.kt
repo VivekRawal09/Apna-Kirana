@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.apnakirana.data.local.entity.Product
 import com.example.apnakirana.data.repository.SampleDataRepository
+import com.example.apnakirana.domain.repository.CartRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductCatalogViewModel @Inject constructor(
     private val sampleDataRepository: SampleDataRepository,
+    private val cartRepository: CartRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -107,8 +109,9 @@ class ProductCatalogViewModel @Inject constructor(
     }
 
     fun onAddToCartClick(product: Product) {
-        // TODO: Add to cart functionality
-        // For now, just show a simple feedback
+        viewModelScope.launch {
+            cartRepository.addToCart(product.id, 1)
+        }
     }
 
     fun clearError() {
