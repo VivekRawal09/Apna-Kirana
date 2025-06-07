@@ -20,12 +20,10 @@ import com.example.apnakirana.presentation.search.SearchScreen
 fun NavGraph(
     navController: NavHostController,
     startDestination: String = Screen.Splash.route,
-    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier
     ) {
         composable(Screen.Splash.route) {
             SplashScreen(

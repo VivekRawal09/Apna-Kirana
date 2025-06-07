@@ -43,6 +43,11 @@ class SearchViewModel @Inject constructor(
                 // Load all products for search
                 sampleDataRepository.getAllProducts().collect { products ->
                     allProducts = products
+
+                    // Debug: Print all available categories
+                    val availableCategories = products.map { it.category }.distinct()
+                    println("🔍 Available product categories: $availableCategories")
+
                     if (_searchQuery.value.isBlank()) {
                         _uiState.value = _uiState.value.copy(
                             searchResults = products,
@@ -54,6 +59,11 @@ class SearchViewModel @Inject constructor(
                 // Load categories for filtering
                 sampleDataRepository.getAllCategories().collect { categories ->
                     allCategories = categories
+
+                    // Debug: Print category names
+                    val categoryNames = categories.map { it.name }
+                    println("🏷️ Filter categories: $categoryNames")
+
                     _uiState.value = _uiState.value.copy(categories = categories)
                 }
             } catch (e: Exception) {
@@ -78,9 +88,7 @@ class SearchViewModel @Inject constructor(
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
-        if (query.isNotBlank()) {
-            addToSearchHistory(query)
-        }
+        // Don't add to history on every keystroke - only on actual search completion
     }
 
     private fun performSearch(query: String) {
@@ -91,11 +99,23 @@ class SearchViewModel @Inject constructor(
                 val filteredProducts = if (query.isBlank()) {
                     allProducts
                 } else {
-                    allProducts.filter { product ->
+                    // Add to search history only when actually performing search
+                    if (query.length >= 2) { // Only save searches with 2+ characters
+                        addToSearchHistory(query)
+                    }
+
+                    val searchResults = allProducts.filter { product ->
                         product.name.contains(query, ignoreCase = true) ||
                                 product.description.contains(query, ignoreCase = true) ||
                                 product.category.contains(query, ignoreCase = true)
                     }
+
+                    println("🔍 Search '$query' found ${searchResults.size} products:")
+                    searchResults.forEach { product ->
+                        println("  - ${product.name} (${product.category})")
+                    }
+
+                    searchResults
                 }
 
                 val finalResults = applyFilters(filteredProducts)
@@ -116,13 +136,24 @@ class SearchViewModel @Inject constructor(
 
     private fun applyFilters(products: List<Product>): List<Product> {
         var filteredProducts = products
+        println("🔍 Starting with ${products.size} products")
 
-        // Apply category filter
+        // Apply category filter with more flexible matching
         val currentState = _uiState.value
         if (currentState.selectedCategory != null) {
-            filteredProducts = filteredProducts.filter {
-                it.category == currentState.selectedCategory
+            val beforeCount = filteredProducts.size
+            filteredProducts = filteredProducts.filter { product ->
+                // More flexible category matching
+                val matches = product.category.equals(currentState.selectedCategory, ignoreCase = true) ||
+                        product.category.contains(currentState.selectedCategory, ignoreCase = true) ||
+                        currentState.selectedCategory.contains(product.category, ignoreCase = true)
+
+                if (matches) {
+                    println("✅ Product '${product.name}' in category '${product.category}' matches filter '${currentState.selectedCategory}'")
+                }
+                matches
             }
+            println("🏷️ After category filter '${currentState.selectedCategory}': ${beforeCount} → ${filteredProducts.size} products")
         }
 
         // Apply sorting
@@ -135,10 +166,12 @@ class SearchViewModel @Inject constructor(
             SortOption.DISCOUNT -> filteredProducts.sortedByDescending { it.discount }
         }
 
+        println("📊 Final result: ${filteredProducts.size} products")
         return filteredProducts
     }
 
     fun selectCategory(category: String?) {
+        println("🏷️ Category selected: $category")
         _uiState.value = _uiState.value.copy(selectedCategory = category)
         performSearch(_searchQuery.value)
     }
@@ -181,6 +214,16 @@ class SearchViewModel @Inject constructor(
 
     fun selectFromHistory(query: String) {
         updateSearchQuery(query)
+        // Add to history when selected from history (move to top)
+        addToSearchHistory(query)
+    }
+
+    fun onSearchSubmitted() {
+        // Called when user presses search button or enter
+        val query = _searchQuery.value
+        if (query.isNotBlank() && query.length >= 2) {
+            addToSearchHistory(query)
+        }
     }
 
     fun clearSearchHistory() {
