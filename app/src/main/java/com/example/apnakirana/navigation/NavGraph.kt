@@ -14,15 +14,18 @@ import com.example.apnakirana.presentation.home.HomeScreen
 import com.example.apnakirana.presentation.catalog.ProductCatalogScreen
 import com.example.apnakirana.presentation.detail.ProductDetailScreen
 import com.example.apnakirana.presentation.cart.CartScreen
+import com.example.apnakirana.presentation.search.SearchScreen
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    startDestination: String = Screen.Splash.route
+    startDestination: String = Screen.Splash.route,
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = modifier
     ) {
         composable(Screen.Splash.route) {
             SplashScreen(
@@ -84,6 +87,7 @@ fun NavGraph(
                 }
             )
         }
+
         composable(
             route = Screen.ProductDetail.route,
             arguments = listOf(
@@ -102,10 +106,15 @@ fun NavGraph(
             )
         }
 
-
+        // ✅ NEW: Real Search Screen Implementation
         composable(Screen.Search.route) {
-            // Placeholder for Search Screen - we'll implement this in Phase 2
-            PlaceholderScreen(title = "Search Screen")
+            SearchScreen(
+                onProductClick = { product ->
+                    navController.navigate(
+                        Screen.ProductDetail.createRoute(product.id)
+                    )
+                }
+            )
         }
 
         composable(Screen.Cart.route) {
