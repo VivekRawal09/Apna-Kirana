@@ -29,6 +29,7 @@ import com.example.apnakirana.domain.model.CartItemWithProduct
 fun CheckoutScreen(
     onBackPressed: () -> Unit,
     onOrderPlaced: (String) -> Unit,
+    onAddNewAddress: () -> Unit = {},
     viewModel: CheckoutViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -184,6 +185,10 @@ fun CheckoutScreen(
             onAddressSelected = { address ->
                 viewModel.selectAddress(address)
                 showAddressSelection = false
+            },
+            onAddNewAddress = {
+                showAddressSelection = false
+                onAddNewAddress() // Navigate to add address
             },
             onDismiss = { showAddressSelection = false }
         )

@@ -47,6 +47,7 @@ fun AddressSelectionBottomSheet(
     addresses: List<Address>,
     selectedAddress: Address?,
     onAddressSelected: (Address) -> Unit,
+    onAddNewAddress: () -> Unit = {},
     onDismiss: () -> Unit
 ) {
     val modalBottomSheetState = rememberModalBottomSheetState()
@@ -88,6 +89,7 @@ fun AddressSelectionBottomSheet(
             OutlinedButton(
                 onClick = {
                     // Navigate to Add Address Screen
+                    onAddNewAddress()
                     onDismiss()
                     // TODO: Navigate to AddAddressScreen
                 },

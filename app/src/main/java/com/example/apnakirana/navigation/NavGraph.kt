@@ -150,6 +150,9 @@ fun NavGraph(
                             inclusive = false
                         }
                     }
+                },
+                onAddNewAddress = {
+                    navController.navigate(Screen.AddAddress.route)
                 }
             )
         }

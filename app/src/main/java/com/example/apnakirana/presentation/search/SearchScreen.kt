@@ -156,7 +156,8 @@ private fun SearchBar(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 70.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+            .padding(16.dp)
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         OutlinedTextField(
@@ -500,7 +501,7 @@ private fun SortBottomSheet(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            SortOption.values().forEach { option ->
+            SortOption.entries.forEach { option ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
