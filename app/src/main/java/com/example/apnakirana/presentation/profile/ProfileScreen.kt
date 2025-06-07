@@ -65,15 +65,15 @@ fun ProfileScreen(
         }
     }
 
-    // Loading state
-    if (uiState.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    }
+//    // Loading state
+//    if (uiState.isLoading) {
+//        Box(
+//            modifier = Modifier.fillMaxSize(),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            CircularProgressIndicator()
+//        }
+//    }
 }
 
 @Composable

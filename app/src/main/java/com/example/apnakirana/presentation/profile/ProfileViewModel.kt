@@ -66,7 +66,7 @@ class ProfileViewModel @Inject constructor(
 }
 
 data class ProfileUiState(
-    val isLoading: Boolean = true,
+    val isLoading: Boolean = false,
     val userName: String = "John Doe", // In real app, get from user prefs/database
     val userEmail: String = "john.doe@example.com", // In real app, get from user prefs
     val joinDate: String = SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(Date()), // Current date as join date

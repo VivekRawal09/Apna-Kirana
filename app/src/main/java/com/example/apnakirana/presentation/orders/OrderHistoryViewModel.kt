@@ -3,7 +3,6 @@ package com.example.apnakirana.presentation.orders
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.apnakirana.data.local.entity.Order
-import com.example.apnakirana.data.local.entity.OrderItem
 import com.example.apnakirana.domain.repository.OrderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
