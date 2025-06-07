@@ -15,9 +15,19 @@ sealed class Screen(val route: String) {
         fun createRoute(productId: String) = "product_detail/$productId"
     }
 
-    // New Checkout Screens
+    // Checkout Screens
     object Checkout : Screen("checkout")
     object OrderConfirmation : Screen("order_confirmation/{orderId}") {
         fun createRoute(orderId: String) = "order_confirmation/$orderId"
     }
+
+    // ✅ NEW: Order History Screens
+    object OrderHistory : Screen("order_history")
+    object OrderDetails : Screen("order_details/{orderId}") {
+        fun createRoute(orderId: String) = "order_details/$orderId"
+    }
+
+    // ✅ NEW: Address Management Screens
+    object AddressManagement : Screen("address_management")
+    object AddAddress : Screen("add_address")
 }

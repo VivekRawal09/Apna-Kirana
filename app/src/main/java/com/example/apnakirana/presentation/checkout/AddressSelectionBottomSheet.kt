@@ -1,4 +1,3 @@
-// AddressSelectionBottomSheet.kt
 package com.example.apnakirana.presentation.checkout
 
 import androidx.compose.foundation.clickable
@@ -37,11 +36,9 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.apnakirana.R
 import com.example.apnakirana.data.local.entity.Address
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,8 +87,9 @@ fun AddressSelectionBottomSheet(
             // Add New Address Button
             OutlinedButton(
                 onClick = {
-                    // TODO: Navigate to Add Address Screen
+                    // Navigate to Add Address Screen
                     onDismiss()
+                    // TODO: Navigate to AddAddressScreen
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -216,7 +214,7 @@ private fun AddressSelectionItem(
                 )
             } else {
                 Icon(
-                    painter = painterResource(id = R.drawable.outline_radio_button_unchecked_24 ),
+                    imageVector = Icons.Default.RadioButtonUnchecked,
                     contentDescription = "Not Selected",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(24.dp)

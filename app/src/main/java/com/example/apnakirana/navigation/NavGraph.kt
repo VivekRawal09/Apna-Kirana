@@ -17,6 +17,11 @@ import com.example.apnakirana.presentation.cart.CartScreen
 import com.example.apnakirana.presentation.search.SearchScreen
 import com.example.apnakirana.presentation.checkout.CheckoutScreen
 import com.example.apnakirana.presentation.checkout.OrderConfirmationScreen
+import com.example.apnakirana.presentation.orders.OrderHistoryScreen
+import com.example.apnakirana.presentation.orders.OrderDetailsScreen
+import com.example.apnakirana.presentation.profile.ProfileScreen
+import com.example.apnakirana.presentation.address.AddressManagementScreen
+import com.example.apnakirana.presentation.address.AddAddressScreen
 
 @Composable
 fun NavGraph(
@@ -125,14 +130,13 @@ fun NavGraph(
                         Screen.ProductDetail.createRoute(productId)
                     )
                 },
-                // ✅ NEW: Add checkout navigation
                 onProceedToCheckout = {
                     navController.navigate(Screen.Checkout.route)
                 }
             )
         }
 
-        // ✅ NEW: Checkout Screen
+        // Checkout Screens
         composable(Screen.Checkout.route) {
             CheckoutScreen(
                 onBackPressed = {
@@ -142,7 +146,6 @@ fun NavGraph(
                     navController.navigate(
                         Screen.OrderConfirmation.createRoute(orderId)
                     ) {
-                        // Clear the back stack to prevent going back to checkout
                         popUpTo(Screen.Home.route) {
                             inclusive = false
                         }
@@ -151,7 +154,6 @@ fun NavGraph(
             )
         }
 
-        // ✅ NEW: Order Confirmation Screen
         composable(
             route = Screen.OrderConfirmation.route,
             arguments = listOf(
@@ -169,16 +171,79 @@ fun NavGraph(
                     }
                 },
                 onTrackOrder = {
-                    // TODO: Navigate to order tracking screen
-                    // For now, just go to profile where orders will be shown
-                    navController.navigate(Screen.Profile.route)
+                    navController.navigate(
+                        Screen.OrderDetails.createRoute(orderId)
+                    )
+                }
+            )
+        }
+
+        // ✅ NEW: Order History Screens
+        composable(Screen.OrderHistory.route) {
+            OrderHistoryScreen(
+                onBackPressed = {
+                    navController.popBackStack()
+                },
+                onOrderClick = { orderId ->
+                    navController.navigate(
+                        Screen.OrderDetails.createRoute(orderId)
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = Screen.OrderDetails.route,
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            OrderDetailsScreen(
+                orderId = orderId,
+                onBackPressed = {
+                    navController.popBackStack()
+                },
+                onReorderClick = { orderItems ->
+                    // TODO: Add items to cart and navigate to cart
+                    // For now, just navigate to home
+                    navController.navigate(Screen.Home.route)
                 }
             )
         }
 
         composable(Screen.Profile.route) {
-            // Placeholder for Profile Screen - we'll implement this in Phase 5
-            PlaceholderScreen(title = "Profile Screen")
+            ProfileScreen(
+                onOrderHistoryClick = {
+                    navController.navigate(Screen.OrderHistory.route)
+                },
+                onAddressManagementClick = {
+                    navController.navigate(Screen.AddressManagement.route)
+                }
+            )
+        }
+
+        // ✅ NEW: Address Management Screens
+        composable(Screen.AddressManagement.route) {
+            AddressManagementScreen(
+                onBackPressed = {
+                    navController.popBackStack()
+                },
+                onAddAddressClick = {
+                    navController.navigate(Screen.AddAddress.route)
+                }
+            )
+        }
+
+        composable(Screen.AddAddress.route) {
+            AddAddressScreen(
+                onBackPressed = {
+                    navController.popBackStack()
+                },
+                onAddressAdded = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
