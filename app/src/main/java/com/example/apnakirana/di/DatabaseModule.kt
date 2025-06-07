@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.example.apnakirana.data.local.ApnaKiranaDatabase
 import com.example.apnakirana.data.local.dao.*
+import com.example.apnakirana.data.repository.OrderRepositoryImpl
+import com.example.apnakirana.domain.repository.OrderRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,7 +26,9 @@ object DatabaseModule {
             context,
             ApnaKiranaDatabase::class.java,
             ApnaKiranaDatabase.DATABASE_NAME
-        ).build()
+        )
+            .fallbackToDestructiveMigration() // ✅ This will recreate DB with new schema
+            .build()
     }
 
     @Provides
@@ -41,4 +45,20 @@ object DatabaseModule {
     fun provideCategoryDao(database: ApnaKiranaDatabase): CategoryDao {
         return database.categoryDao()
     }
+
+    @Provides
+    fun provideOrderDao(database: ApnaKiranaDatabase): OrderDao {
+        return database.orderDao()
+    }
+
+    @Provides
+    fun provideAddressDao(database: ApnaKiranaDatabase): AddressDao {
+        return database.addressDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrderRepository(
+        orderRepositoryImpl: OrderRepositoryImpl
+    ): OrderRepository = orderRepositoryImpl
 }

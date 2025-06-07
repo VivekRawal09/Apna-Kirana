@@ -61,17 +61,13 @@ class CartViewModel @Inject constructor(
             cartRepository.clearCart()
         }
     }
-
-    fun proceedToCheckout() {
-        // TODO: Navigate to checkout screen
-    }
 }
 
 data class CartUiState(
     val isLoading: Boolean = true,
     val cartItems: List<CartItemWithProduct> = emptyList(),
     val totalAmount: Double = 0.0,
-    val totalQuantity: Int = 0,
+    val totalQuantity: Int = 0, // Keep this for internal calculations
     val deliveryFee: Double = 0.0,
     val errorMessage: String? = null
 ) {
@@ -86,4 +82,8 @@ data class CartUiState(
 
     val isEmpty: Boolean
         get() = cartItems.isEmpty()
+
+    // ✅ NEW: Add unique items count property
+    val uniqueItemsCount: Int
+        get() = cartItems.size // This gives count of different products, not quantities
 }

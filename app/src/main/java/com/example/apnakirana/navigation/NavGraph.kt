@@ -15,15 +15,19 @@ import com.example.apnakirana.presentation.catalog.ProductCatalogScreen
 import com.example.apnakirana.presentation.detail.ProductDetailScreen
 import com.example.apnakirana.presentation.cart.CartScreen
 import com.example.apnakirana.presentation.search.SearchScreen
+import com.example.apnakirana.presentation.checkout.CheckoutScreen
+import com.example.apnakirana.presentation.checkout.OrderConfirmationScreen
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     startDestination: String = Screen.Splash.route,
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
+        modifier = modifier
     ) {
         composable(Screen.Splash.route) {
             SplashScreen(
@@ -104,7 +108,6 @@ fun NavGraph(
             )
         }
 
-        // ✅ NEW: Real Search Screen Implementation
         composable(Screen.Search.route) {
             SearchScreen(
                 onProductClick = { product ->
@@ -121,12 +124,60 @@ fun NavGraph(
                     navController.navigate(
                         Screen.ProductDetail.createRoute(productId)
                     )
+                },
+                // ✅ NEW: Add checkout navigation
+                onProceedToCheckout = {
+                    navController.navigate(Screen.Checkout.route)
+                }
+            )
+        }
+
+        // ✅ NEW: Checkout Screen
+        composable(Screen.Checkout.route) {
+            CheckoutScreen(
+                onBackPressed = {
+                    navController.popBackStack()
+                },
+                onOrderPlaced = { orderId ->
+                    navController.navigate(
+                        Screen.OrderConfirmation.createRoute(orderId)
+                    ) {
+                        // Clear the back stack to prevent going back to checkout
+                        popUpTo(Screen.Home.route) {
+                            inclusive = false
+                        }
+                    }
+                }
+            )
+        }
+
+        // ✅ NEW: Order Confirmation Screen
+        composable(
+            route = Screen.OrderConfirmation.route,
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+            OrderConfirmationScreen(
+                orderId = orderId,
+                onContinueShopping = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onTrackOrder = {
+                    // TODO: Navigate to order tracking screen
+                    // For now, just go to profile where orders will be shown
+                    navController.navigate(Screen.Profile.route)
                 }
             )
         }
 
         composable(Screen.Profile.route) {
-            // Placeholder for Profile Screen - we'll implement this in Phase 4
+            // Placeholder for Profile Screen - we'll implement this in Phase 5
             PlaceholderScreen(title = "Profile Screen")
         }
     }

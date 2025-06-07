@@ -27,10 +27,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.apnakirana.R
 import com.example.apnakirana.domain.model.CartItemWithProduct
-
 @Composable
 fun CartScreen(
     onProductClick: (String) -> Unit = {},
+    onProceedToCheckout: () -> Unit,
     viewModel: CartViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -52,13 +52,14 @@ fun CartScreen(
         ) {
             // Cart Header
             CartHeader(
-                itemCount = uiState.totalQuantity,
+                itemCount = uiState.uniqueItemsCount, // ✅ Unique items count
+                totalQuantity = uiState.totalQuantity, // ✅ Total quantity
                 onClearCart = viewModel::clearCart
             )
 
-            // Scrollable Content
+            // ✅ Simplified: Single scrollable column with everything inside
             LazyColumn(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -78,54 +79,23 @@ fun CartScreen(
                     )
                 }
 
-                // Order Summary
+                // ✅ Order Summary with integrated checkout button
                 item {
-                    CartSummaryCard(uiState = uiState)
-                }
-
-                // Extra spacing for checkout button
-                item {
-                    Spacer(modifier = Modifier.height(80.dp))
-                }
-            }
-
-            // Fixed Checkout Button at Bottom
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.White,
-                shadowElevation = 8.dp
-            ) {
-                Button(
-                    onClick = { viewModel.proceedToCheckout() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50)
+                    CartSummaryCard(
+                        uiState = uiState,
+                        onProceedToCheckout = onProceedToCheckout // ✅ Pass the callback
                     )
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Proceed to Checkout • ₹${uiState.finalTotal.toInt()}",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
+                }
+
+                // ✅ Extra bottom spacing for system navigation
+                item {
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
             }
         }
+
+        // ✅ REMOVE: No more separate checkout button section
+        // The button is now integrated in CartSummaryCard
     }
 }
 
@@ -133,15 +103,26 @@ fun CartScreen(
 @Composable
 fun CartHeader(
     itemCount: Int,
+    totalQuantity: Int, // ✅ Add total quantity parameter
     onClearCart: () -> Unit
 ) {
     TopAppBar(
         title = {
-            Text(
-                text = "My Cart ($itemCount items)",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Column {
+                Text(
+                    text = "My Cart ($itemCount items)", // ✅ Shows unique items
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                // ✅ Optional: Show total quantity as subtitle
+                if (totalQuantity != itemCount) {
+                    Text(
+                        text = "$totalQuantity pieces total",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
         },
         actions = {
             if (itemCount > 0) {
@@ -325,7 +306,8 @@ fun CartItemCard(
 
 @Composable
 fun CartSummaryCard(
-    uiState: CartUiState
+    uiState: CartUiState,
+    onProceedToCheckout: () -> Unit // ✅ Add this parameter
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -437,9 +419,46 @@ fun CartSummaryCard(
                     fontWeight = FontWeight.Medium
                 )
             }
+
+            // ✅ NEW: Checkout Button integrated in the card
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = onProceedToCheckout,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50)
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp
+                )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Proceed to Checkout",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
         }
     }
 }
+
 
 @Composable
 private fun SummaryRow(
